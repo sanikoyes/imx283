@@ -1,0 +1,40 @@
+#include <stdarg.h>
+#include <registers/regspinctrl.h>
+
+int main() {
+
+	// HW_PINCTRL_MUXSEL3_SET(0x00003000);                           /*      Function select         */     
+	// HW_PINCTRL_DRIVE6_SET(0x05000000);
+	// HW_PINCTRL_PULL1_SET(1<<22);
+	// HW_PINCTRL_DOE1_SET(1<<22);
+	// HW_PINCTRL_DOUT1_SET(1<<22);
+
+	HW_PINCTRL_MUXSEL4_SET(0x0000C000);
+	HW_PINCTRL_DRIVE7_SET(0x50000000);
+	HW_PINCTRL_PULL2_SET(1<<7);
+	HW_PINCTRL_DOE2_SET(1<<7);
+	HW_PINCTRL_DOUT2_SET(1<<7);
+
+	HW_PINCTRL_MUXSEL7_SET(0x00000300);
+	HW_PINCTRL_DRIVE14_SET(0x00050000);
+	HW_PINCTRL_PULL3_SET(1<<20);
+	HW_PINCTRL_DOE3_SET(1<<20);
+	HW_PINCTRL_DOUT3_SET(1<<20);
+
+	volatile i = 0;
+	for(;;) {
+
+		// HW_PINCTRL_DOUT1_SET(1<<22);
+		HW_PINCTRL_DOUT2_SET(1<<7);
+		HW_PINCTRL_DOUT3_CLR(1<<20);
+		i = 4000000;
+		while(i--);
+
+		// HW_PINCTRL_DOUT1_CLR(1<<22); 
+		HW_PINCTRL_DOUT2_CLR(1<<7);
+		HW_PINCTRL_DOUT3_SET(1<<20);
+		i = 4000000;
+		while(i--);
+	}
+	return 0;
+}
