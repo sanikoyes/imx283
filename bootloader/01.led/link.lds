@@ -19,13 +19,7 @@ SECTIONS {
 	.rodata : { KEEP(*(.rodata)) }
 
 	. = ALIGN(32);
-	.cmdlines : { KEEP(*(.cmdlines)) }
-
-	. = ALIGN(32);
 	.data : { KEEP(*(.data)) }
-
-	. = ALIGN(32);
-	.got : { KEEP(*(.got)) }
 
 	. = ALIGN(32);
 	_end = .;
