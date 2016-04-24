@@ -32,7 +32,7 @@ main: $(OBJS)
 link: $(OBJS)
 	@mkdir -p $(OUTPUTDIR)
 	$(LD) -o $(TARGET) $(LIBS) $(LDFLAGS) $^
-	$(NM) -n $(TARGET) > $(MAP).txt
+	$(NM) -n -S $(TARGET) > $(MAP).txt
 	$(OBJCOPY) -O binary $(TARGET) $(BIN)
 
 libs:

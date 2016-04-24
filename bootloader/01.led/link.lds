@@ -7,27 +7,27 @@ SECTIONS {
 	. = 0x00000000;
 	.start : { KEEP(*(.start)) }
 
-	. = ALIGN(32);
+	. = ALIGN(4);
 	.text : { KEEP(*(.text)) }
 
-	. = ALIGN(32);
+	. = ALIGN(4);
 	_hwinit_start = .;
 	.hwinitcall : { KEEP(*(.hwinitcall)) }
 	_hwinit_end = .;
 
-	. = ALIGN(32);
+	. = ALIGN(4);
 	.rodata : { KEEP(*(.rodata)) }
 
-	. = ALIGN(32);
+	. = ALIGN(4);
 	.data : { KEEP(*(.data)) }
 
-	. = ALIGN(32);
+	. = ALIGN(4);
 	_end = .;
 
-	. = ALIGN(32);
+	. = ALIGN(4);
 	_bss_start = .;
 	.bss : { KEEP(*(.bss*)) }
-	. = ALIGN(32);
+	. = ALIGN(4);
 	_bss_end = .;
 
 	_heap_start = .;
