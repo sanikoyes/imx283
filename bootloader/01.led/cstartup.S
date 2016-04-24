@@ -6,40 +6,57 @@
  * kind,whether express or implied.
  */
 
+#include <arch/asm_defines.h>
+
 	.code 32
 	.section ".start","ax"
 
 	.global _start
+
 ////////////////////////////////////////////////////////////////////////////////
 // initialize vector
 ////////////////////////////////////////////////////////////////////////////////
-__vector:
-    ldr	pc,[pc,#24]	// Absolute jump can reach 4 GByte
-    // b ?cstartup	// Relative branch allows remap,limited to 32 MByte
-__undef_handler:
-    ldr	pc,[pc,#24]	// Branch to undef_handler
-__swi_handler:
-    ldr	pc,[pc,#24]	// Branch to swi_handler
-__prefetch_handler:
-    ldr	pc,[pc,#24]	// Branch to prefetch_handler
-__data_handler:
-    ldr	pc,[pc,#24]	// Branch to data_handler
-    .int 0xFFFFFFFF
-__irq_handler:
-    ldr	pc,[pc,#24]	// Branch to irq_handler
-__fiq_handler:
-    ldr	pc,[pc,#24]	// Branch to fiq_handler
+    .func startup_vectors
+startup_vectors:
+        ldr     pc, reset_addr
+        ldr     pc, undefined_addr
+        ldr     pc, swi_addr
+        ldr     pc, prefetch_addr
+        ldr     pc, abort_addr
+        nop                             /* reserved vector */
+        ldr     pc, irq_addr
+        ldr     pc, fiq_addr
 
-// Constant table entries (for ldr pc) will be placed at 0x20
-    .int _start
-    .int __undef_handler
-    .int __swi_handler
-    .int __prefetch_handler
-    .int __data_handler
-    .int 0xFFFFFFFF
-    .int __irq_handler
-    .int __fiq_handler
+reset_addr:      .word     _start
+undefined_addr:  .word     undefined_handler
+swi_addr:        .word     swi_handler
+prefetch_addr:   .word     prefetch_handler
+abort_addr:      .word     abort_handler
+irq_addr:        .word     irq_handler
+fiq_addr:        .word     fiq_handler
 
+/*!
+ * Exception Handlers
+ */
+undefined_handler:
+        b       undefined_handler
+swi_handler:
+        b       swi_handler
+prefetch_handler:
+        b       prefetch_handler
+abort_handler:
+        b       abort_handler
+irq_handler:
+        b       irq_handler
+fiq_handler:
+        b       fiq_handler
+
+    .endfunc    //startup()
+
+////////////////////////////////////////////////////////////////////////////////
+// entry
+////////////////////////////////////////////////////////////////////////////////
+    .func _start
 _start:
 	// Initialize stack registers
 	bl stack_init
@@ -53,76 +70,28 @@ _start:
 	// halt
 1:
 	b 1b
-
-	.pool
+    .endfunc
 
 /*
  * Initialize stack registers
  */
 stack_init:
+    mov r1, lr
+    ldr r0, =_heap_start
+    msr cpsr_c, #MODE_FIQ | I_BIT | F_BIT /* no interrupts*/
+    add sp, r0, #OFFSET_FIQ_STACK
+    msr cpsr_c, #MODE_IRQ | I_BIT | F_BIT /* no interrupts */
+    add sp, r0, #OFFSET_IRQ_STACK
+    msr cpsr_c, #MODE_ABT | I_BIT | F_BIT /* no interrupts */
+    add sp, r0, #OFFSET_ABT_STACK
+    msr cpsr_c, #MODE_UND | I_BIT | F_BIT
+    add sp, r0, #OFFSET_UND_STACK
+    msr cpsr_c, #MODE_SVC | I_BIT | F_BIT /* no interrupts */
+    add sp, r0, #OFFSET_SVC_STACK
+    msr cpsr_c, #MODE_SYS | I_BIT | F_BIT /* no interrupts */
+    add sp, r0, #OFFSET_SYS_STACK
+    mov pc, r1
 
-// --------------------
-// Mode,correspords to bits 0-5 in CPSR
-
-#define MODE_MSK 0x1F            // Bit mask for mode bits in CPSR
-
-#define USR_MODE 0x10            // User mode
-#define FIQ_MODE 0x11            // Fast Interrupt Request mode
-#define IRQ_MODE 0x12            // Interrupt Request mode
-#define SVC_MODE 0x13            // Supervisor mode
-#define ABT_MODE 0x17            // Abort mode
-#define UND_MODE 0x1B            // Undefined Instruction mode
-#define SYS_MODE 0x1F            // System mode
-
-// Size in byte of stacks
-#define IRQ_STACK 64
-#define FIQ_STACK 64
-#define SVC_STACK 64
-#define ABT_STACK 64
-#define UND_STACK 64
-#define CSTACK 1024
-
-	ldr r2,=_heap_start
-
-    mov r1,lr
-    mrs r0,cpsr                             // Original PSR value
-    bic r0,r0,#MODE_MSK                     // Clear the mode bits
-    orr r0,r0,#SVC_MODE                     // Set Supervisor mode bits
-    msr cpsr_c,r0                           // Change the mode
-    add r2,#SVC_STACK
-    mov sp,r2                               // End of SVC_STACK
-
-    bic r0,r0,#MODE_MSK                     // Clear the mode bits
-    orr r0,r0,#ABT_MODE                     // Set Abort mode bits
-    msr cpsr_c,r0                           // Change the mode
-    add r2,#ABT_STACK
-    mov sp,r2                               // End of ABT_STACK
-
-    bic r0,r0,#MODE_MSK                     // Clear the mode bits
-    orr r0,r0,#UND_MODE                     // Set Undefined mode bits
-    msr cpsr_c,r0                           // Change the mode
-    add r2,#UND_STACK
-    mov sp,r2                               // End of UND_STACK
-
-    bic r0,r0,#MODE_MSK                     // Clear the mode bits
-    orr r0,r0,#FIQ_MODE                     // Set FIR mode bits
-    msr cpsr_c,r0                           // Change the mode
-    add r2,#FIQ_STACK
-    mov sp,r2                               // End of FIQ_STACK
-
-    bic r0,r0,#MODE_MSK                     // Clear the mode bits
-    orr r0,r0,#IRQ_MODE                     // Set IRQ mode bits
-    msr cpsr_c,r0                           // Change the mode
-    add r2,#IRQ_STACK
-    mov sp,r2                               // End of IRQ_STACK
-
-    bic r0,r0,#MODE_MSK                     // Clear the mode bits
-    orr r0,r0,#SYS_MODE                     // Set System mode bits
-    msr cpsr_c,r0                           // Change the mode
-    add r2,#CSTACK
-    mov sp,r2                               // End of CSTACK
-
-    mov pc,r1
     .pool
 
 /*
