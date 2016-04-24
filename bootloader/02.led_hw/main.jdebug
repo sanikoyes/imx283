@@ -31,27 +31,12 @@ void OnProjectLoad (void) {
 *                                                                     
 **********************************************************************
 */                                                                    
-/*
 void TargetReset (void) {                                             
                                                                       
-  unsigned int SP;                                                    
-  unsigned int PC;                                                    
-  unsigned int VectorTableAddr;                                       
-                                                                      
-  Util.Log("Resetting Program.");                                   
-                                                                      
-  Exec.Reset();                                                       
-                                                                      
-  VectorTableAddr = Elf.GetBaseAddr();                                
-                                                                      
-  SP = Target.ReadU32(VectorTableAddr);                               
-  Target.SetReg("SP", SP);                                          
-                                                                      
-  PC = Target.ReadU32(VectorTableAddr + 4);                           
-  Target.SetReg("PC", PC);                                          
+  Util.Log("Resetting Program.");                                                                      
+  Exec.Reset();
+  Target.SetReg("PC", Elf.GetBaseAddr());                                          
 }                                                                     
-*/
-
 /*********************************************************************
 *                                                                     
 *       BeforeTargetReset                                             
@@ -178,25 +163,11 @@ void BeforeTargetDownload (void) {
 *                                                                     
 **********************************************************************
 */                                                                    
-/*
 void AfterTargetDownload (void) {                                     
                                                                       
-  unsigned int SP;                                                    
-  unsigned int PC;                                                    
-  unsigned int VectorTableAddr;                                       
-                                                                      
   Util.Log("Initializing PC and SP.");                              
-                                                                      
-  VectorTableAddr = Elf.GetBaseAddr();                                
-                                                                      
-  SP = Target.ReadU32(VectorTableAddr);                               
-  Target.SetReg("SP", SP);                                          
-                                                                      
-  PC = Target.ReadU32(VectorTableAddr + 4);                           
-  Target.SetReg("PC", PC);                                          
+  Target.SetReg("PC", Elf.GetBaseAddr());                                          
 }                                                                     
-*/
-
 /*********************************************************************
 *                                                                     
 *       BeforeTargetDisconnect                                        
