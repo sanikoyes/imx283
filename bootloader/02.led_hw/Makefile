@@ -10,63 +10,8 @@ include ../Makefile.inc
 NAME = main
 BASE_ADDR ?= 0x00000000
 
-TARGET = $(OUTPUTDIR)/$(NAME).elf
-MAP = $(OUTPUTDIR)/$(NAME).map
-BIN = $(OUTPUTDIR)/$(NAME).bin
-
 ASMS = ../mach-mx28/cstartup.S
-
 SRCS = main.c \
 	../mach-mx28/hw/led/led.c
 
-OBJS = $(ASMS:.S=.o)
-OBJS += $(SRCS:.c=.o)
-
-vpath %.o $(OUTPUTDIR)
-
-%.o: %.S
-	@mkdir -p $(OUTPUTDIR)/$(dir $@)
-	$(CC) -c $(CFLAGS) -D__LANGUAGE_ASM__ -o $(OUTPUTDIR)/$@ $<
-
-%.o: %.arm
-	@mkdir -p $(OUTPUTDIR)/$(dir $@)
-	$(CC) -c $(CFLAGS) -D__LANGUAGE_ASM__ -o $(OUTPUTDIR)/$@ $<
-
-%.o: %.c
-	@mkdir -p $(OUTPUTDIR)/$(dir $@)
-	$(CC) -c $(CFLAGS) -o $(OUTPUTDIR)/$@ $<
-
-#
-# Make targets
-#
-.PHONY: build main clean
-all: echo libs main
-rebuild: clean all
-
-main: $(OBJS)
-	$(MAKE) link
-
-link: $(OBJS)
-	@mkdir -p $(OUTPUTDIR)
-	$(LD) -o $(TARGET) $(LIBS) $(LDFLAGS) $^
-	$(NM) -n $(TARGET) > $(MAP).txt
-	$(OBJCOPY) -O binary $(TARGET) $(BIN)
-
-libs:
-	@echo Make librarys...
-
-clean:
-	@echo Cleaning...
-	$(RM) -r mach-mx28/*
-	$(RM) -r $(OUTPUTDIR)/*
-
-echo:
-	@echo "CURRENTDIR= $(CURRENTDIR)"
-	@echo "CC= $(CC)"
-	@echo "RANLIB= $(RANLIB)"
-	@echo "AR= $(AR)"
-	@echo "CFLAGS= $(CFLAGS)"
-	@echo "LDFLAGS= $(SYSLDFLAGS)"
-	@echo "LIBS= $(LIBS)"
-	@echo "TARGET= $(TARGET)"
-	@echo "RM= $(RM)"
+include ../Makefile.build
