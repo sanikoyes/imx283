@@ -12,21 +12,10 @@
  */
 
 #include "beep.h"
+#include "delay/delay.h"
+
 #include <arch/init.h>
 #include <registers/regspinctrl.h>
-#include <registers/regsdigctl.h>
-
-void delay(unsigned int us)
-{
-	unsigned int start , cur;
-	start = cur = HW_DIGCTL_MICROSECONDS_RD();
-
-	while (cur < start+us) {
-
-		cur = HW_DIGCTL_MICROSECONDS_RD();
-		/*printf("0x%x\r\n",cur);*/
-	}
-}
 
 void hw_beep() {
 
@@ -34,14 +23,14 @@ void hw_beep() {
 
 #ifdef IMX283A
 		HW_PINCTRL_DOUT1_SET(1 << 21);
-		delay(500);
+		hw_delay_us(500);
 		HW_PINCTRL_DOUT1_CLR(1 << 21);
-		delay(50);
+		hw_delay_us(50);
 #else
 		HW_PINCTRL_DOUT2_SET(1 << 6);
-		delay(500);
+		hw_delay_us(500);
 		HW_PINCTRL_DOUT2_CLR(1 << 6);
-		delay(50);
+		hw_delay_us(50);
 #endif
 	}
 }
