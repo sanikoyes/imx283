@@ -50,7 +50,7 @@ endif
 LDFLAGS = -static -gc-sections -nostdlib -T $(BOOT_LAYOUT) -Map $(MAP)
 LIBS =
 
-ASMS = cstartup.S
+ASMS = ../mach-mx28/cstartup.S
 
 SRCS = main.c
 
@@ -82,6 +82,7 @@ main: $(OBJS)
 	$(MAKE) link
 
 link: $(OBJS)
+	@mkdir -p $(OUTPUTDIR)
 	$(LD) -o $(TARGET) $(LIBS) $(LDFLAGS) $^
 	$(NM) -n $(TARGET) > $(MAP).txt
 	$(OBJCOPY) -O binary $(TARGET) $(BIN)
@@ -91,6 +92,7 @@ libs:
 
 clean:
 	@echo Cleaning...
+	$(RM) -r mach-mx28/*
 	$(RM) -r $(OUTPUTDIR)/*
 
 echo:

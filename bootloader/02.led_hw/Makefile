@@ -38,7 +38,7 @@ BOOT_LAYOUT	= $(SRCDIR)/link.lds
 ################################################################################
 # compiler/linker flags
 ################################################################################
-INCLUDE = -I../mach-mx28/includes
+INCLUDE = -I../mach-mx28/includes -I../mach-mx28/hw
 CFLAGS = -g -Wall $(INCLUDE) -I./ -I./src -D$(BOARD) -fdata-sections -ffunction-sections
 
 ifeq ($(DEBUG),YES)
@@ -50,11 +50,11 @@ endif
 LDFLAGS = -static -gc-sections -nostdlib -T $(BOOT_LAYOUT) -Map $(MAP)
 LIBS =
 
-ASMS = cstartup.S
+ASMS = ../mach-mx28/cstartup.S
 
 SRCS = main.c \
-	src/hw/led.c
-
+	../mach-mx28/hw/led/led.c
+	
 OBJS = $(ASMS:.S=.o)
 OBJS += $(SRCS:.c=.o)
 
@@ -83,6 +83,7 @@ main: $(OBJS)
 	$(MAKE) link
 
 link: $(OBJS)
+	@mkdir -p $(OUTPUTDIR)
 	$(LD) -o $(TARGET) $(LIBS) $(LDFLAGS) $^
 	$(NM) -n $(TARGET) > $(MAP).txt
 	$(OBJCOPY) -O binary $(TARGET) $(BIN)
@@ -92,6 +93,7 @@ libs:
 
 clean:
 	@echo Cleaning...
+	$(RM) -f $(OBJS)
 	$(RM) -r $(OUTPUTDIR)/*
 
 echo:
