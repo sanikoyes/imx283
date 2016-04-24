@@ -1,5 +1,7 @@
 /*
- * main entry code.
+ * entry code.
+ *
+ * sanikoyes <sanikoyes@163.com>
  *
  * This file is licensed under the terms of the GNU General Public License
  * version 2.  This program  is licensed "as is" without any warranty of any
