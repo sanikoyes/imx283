@@ -2,59 +2,23 @@
 # i.mx280A/283A led
 ################################################################################
 
-################################################################################
-# cross compile toolchain defines
-################################################################################
-CROSS_COMPILE ?= arm-none-eabi-
-
-AS = $(CROSS_COMPILE)as
-CC = $(CROSS_COMPILE)gcc -std=gnu99
-CPP = $(CROSS_COMPILE)cpp
-LD = $(CROSS_COMPILE)ld
-STRIP = $(CROSS_COMPILE)strip
-OBJCOPY = $(CROSS_COMPILE)objcopy
-OBJDUMP = $(CROSS_COMPILE)objdump
-RANLIB = $(CROSS_COMPILE)ranlib
-NM = $(CROSS_COMPILE)nm
-RM = rm -f
+include ../Makefile.inc
 
 ################################################################################
 # build settings
 ################################################################################
 NAME = main
-BOARD ?= IMX280A
-DEBUG ?= YES
 BASE_ADDR ?= 0x00000000
 
-CURRENTDIR = .
-SRCDIR = $(CURRENTDIR)
-OUTPUTDIR = $(CURRENTDIR)/output-target
 TARGET = $(OUTPUTDIR)/$(NAME).elf
 MAP = $(OUTPUTDIR)/$(NAME).map
 BIN = $(OUTPUTDIR)/$(NAME).bin
-# COMMONSRCDIR	= $(CURRENTDIR)/../mach-$(ARCH)
-BOOT_LAYOUT	= $(SRCDIR)/link.lds
-
-################################################################################
-# compiler/linker flags
-################################################################################
-INCLUDE = -I../mach-mx28/includes -I../mach-mx28/hw
-CFLAGS = -g -Wall $(INCLUDE) -I./ -I./src -D$(BOARD) -fdata-sections -ffunction-sections
-
-ifeq ($(DEBUG),YES)
-CFLAGS += -O0 -DDEBUG
-else
-CFLAGS += -O3
-endif
-
-LDFLAGS = -static -gc-sections -nostdlib -T $(BOOT_LAYOUT) -Map $(MAP)
-LIBS =
 
 ASMS = ../mach-mx28/cstartup.S
 
 SRCS = main.c \
 	../mach-mx28/hw/led/led.c
-	
+
 OBJS = $(ASMS:.S=.o)
 OBJS += $(SRCS:.c=.o)
 
@@ -93,7 +57,7 @@ libs:
 
 clean:
 	@echo Cleaning...
-	$(RM) -f $(OBJS)
+	$(RM) -r mach-mx28/*
 	$(RM) -r $(OUTPUTDIR)/*
 
 echo:

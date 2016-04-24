@@ -30,6 +30,7 @@ int hw_led_get(HW_LEDS led) {
 	break;
 	}
 #endif
+	return 0;
 }
 
 void hw_led_set(HW_LEDS led, int on) {
