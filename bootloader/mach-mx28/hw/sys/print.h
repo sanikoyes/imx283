@@ -1,5 +1,5 @@
 /*
- * Low-level beep driver
+ * Low-level debug library
  *
  * sanikoyes <sanikoyes@163.com>
  *
@@ -12,4 +12,8 @@
  */
 #pragma once
 
-void hw_beep();
+int putch(int ch);
+int getch();
+void printhex(int data);
+int puts(const char *fmt);
+int printf(const char *fmt, ...);

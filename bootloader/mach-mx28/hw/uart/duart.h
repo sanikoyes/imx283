@@ -1,5 +1,5 @@
 /*
- * Low-level beep driver
+ * Low-level debug uart driver
  *
  * sanikoyes <sanikoyes@163.com>
  *
@@ -12,4 +12,5 @@
  */
 #pragma once
 
-void hw_beep();
+void hw_duart_putch(int ch);
+int hw_duart_getch();
