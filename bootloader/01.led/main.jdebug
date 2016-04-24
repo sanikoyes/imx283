@@ -15,7 +15,7 @@ void OnProjectLoad (void) {
   Project.SetTargetIF ("JTAG");
   Project.SetTIFSpeed ("1 MHz");
   Project.AddSvdFile ("ARM9.svd");
-  File.Open ("D:/mingw/home/Saniko/i.MX28/bootloader/01.led/output-target/main.elf");
+  File.Open ("./output-target/main.elf");
 }
 
 /*********************************************************************

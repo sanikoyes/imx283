@@ -39,7 +39,7 @@ BOOT_LAYOUT	= $(SRCDIR)/link.lds
 # compiler/linker flags
 ################################################################################
 INCLUDE = -I../mach-mx28/includes
-CFLAGS = -g -Wall $(INCLUDE) -I./ -D$(BOARD)
+CFLAGS = -g -Wall $(INCLUDE) -I./ -I./src -D$(BOARD) -fdata-sections -ffunction-sections
 
 ifeq ($(DEBUG),YES)
 CFLAGS += -O0 -DDEBUG
@@ -60,15 +60,15 @@ OBJS += $(SRCS:.c=.o)
 vpath %.o $(OUTPUTDIR)
 
 %.o: %.S
-	@mkdir -p $(OUTPUTDIR)
+	@mkdir -p $(OUTPUTDIR)/$(dir $@)
 	$(CC) -c $(CFLAGS) -D__LANGUAGE_ASM__ -o $(OUTPUTDIR)/$@ $<
 
 %.o: %.arm
-	@mkdir -p $(OUTPUTDIR)
+	@mkdir -p $(OUTPUTDIR)/$(dir $@)
 	$(CC) -c $(CFLAGS) -D__LANGUAGE_ASM__ -o $(OUTPUTDIR)/$@ $<
 
 %.o: %.c
-	@mkdir -p $(OUTPUTDIR)
+	@mkdir -p $(OUTPUTDIR)/$(dir $@)
 	$(CC) -c $(CFLAGS) -o $(OUTPUTDIR)/$@ $<
 
 #
@@ -91,7 +91,7 @@ libs:
 
 clean:
 	@echo Cleaning...
-	$(RM) $(OUTPUTDIR)/*
+	$(RM) -r $(OUTPUTDIR)/*
 
 echo:
 	@echo "CURRENTDIR= $(CURRENTDIR)"
